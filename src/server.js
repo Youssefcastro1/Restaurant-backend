@@ -1,12 +1,15 @@
+require('./Database/sync.js')
+
 const express = require('express');
 const app = express();
-const conecction = require('./Database.conecction');
+const connection = require('./Database/connection.js');
 const port = process.env.PORT || 1337;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-conecction.sync()
-.then(()=>{
+
+connection.sync({force : false})
+ .then(()=> {
     console.log('Base de datos sincronizada');
     app.listen(port,()=>{
         console.log('la aplicacion corre en el puerto: ' + port);
