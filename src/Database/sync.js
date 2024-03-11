@@ -1,47 +1,56 @@
-const connection = require('./connection.js');
+const connection = require('./connection');
 
 //Models
 const restaurant = require('../Models/restaurant');
 const product = require('../Models/product');
-const department = require('../Models/department.js');
-const city = require('../Models/city.js');
+const department = require('../Models/department');
+const city = require('../Models/city');
 
-const departmentjson = require('./jsonfiles/departmentjson.js');
-const cityjson = require('./jsonfiles/cityjson.js');
+//JSON
+const departamentjson = require('./jsonfiles/departmentjson');
+const cityjson = require('./jsonfiles/cityjson');
 
-function sync(){
-    //Foreing Key restaurant - product
+async function sync(){
+    //Foreign Key restaurant - product
     restaurant.hasMany(product,{
         foreignKey: 'restaurantId',
         onDelete: 'restrict',
-        onUpdate: 'cascade'
+        onUpdate:'cascade'
     });
     product.belongsTo(restaurant,{
         foreignKey: 'restaurantId'
     });
 
-    //Foreing Key department - city
-    department.hasMany(city,{
+    //Foreign Key departament - city
+    department.hasMany(city, {
         foreignKey: 'departmentId',
         onDelete: 'restrict',
-        onUpdate: 'cascade'
+        onUpdate:'cascade'
     });
     city.belongsTo(department,{
         foreignKey: 'departmentId'
-    });
+    })
 
-    //Foreing Key city - restaurant
+    //Foreign Key city - restaurant
     city.hasMany(restaurant,{
         foreignKey: 'cityId',
         onDelete: 'restrict',
-        onUpdate: 'cascade'
+        onUpdate:'cascade'
     });
     restaurant.belongsTo(city,{
         foreignKey: 'cityId'
     });
-    
-    // create json
-    departmentjson.createDepartments();
+
+    await connection.sync({force: false})
+    .then(() => { 
+        console.log('Synchronized DataBase');
+    })
+    .catch((error) => { 
+        console.error('Error syncing DataBase' + error);
+    }); 
+
+    //create json
+    departamentjson.createDepartments();
     cityjson.createCities();
 }
 
